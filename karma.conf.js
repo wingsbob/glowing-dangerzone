@@ -37,7 +37,8 @@ module.exports = function(config) {
     reporters: ['progress'],
 
     browserify: {
-        debug: true
+        debug: true,
+        plugin: ['proxyquire-universal']
     },
 
     // web server port
