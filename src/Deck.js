@@ -2,12 +2,16 @@
 	'use strict';
 
 	var Card = require('./Card'),
+		randomUtils = require('./Utils/randomness'),
 		CARDS_IN_A_DECK = 52;
 
 	function Deck () {
 		this.cards = [];
 	}
 
+	/**
+	 * Populates the deck with the required cards and shuffles
+	 */
 	Deck.prototype.init = function() {
 		var i,
 			cards = this.cards;
@@ -22,13 +26,18 @@
 	Deck.prototype.shuffle = function() {
 		var currentCard,
 			unshuffledCards = this.cards.concat(),
+			numberOfCards = unshuffledCards.length,
 			i;
 
 		this.cards = [];
-		while (unshuffledCards.length > 0) {
-			currentCard = Math.floor(Math.random() * unshuffledCards.length);
-			this.cards.push(unshuffledCards.splice(currentCard, 1)[0]);
+		for (i = 0; i < numberOfCards; i++) {
+			currentCard = randomUtils.spliceArrayElement(unshuffledCards);
+			this.cards.push(currentCard);
 		}
+	};
+
+	Deck.prototype.draw = function() {
+		return this.cards.pop();
 	};
 
 	module.exports = Deck;

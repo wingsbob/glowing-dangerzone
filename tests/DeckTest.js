@@ -3,8 +3,10 @@
 
 	var proxyquire = require('proxyquire'),
 		fakeCard = jasmine.createSpy(),
+		fakeRandom = {},
 		Deck = proxyquire('../src/Deck', {
 			'./Card': fakeCard,
+			'./Utils/randomness': fakeRandom,
 			'@noCallThru': true
 		}),
 		deckInstance;
@@ -319,22 +321,31 @@
 			beforeEach(function () {
 				deckInstance = new Deck();
 				deckInstance.cards = [firstCard, secondCard, thirdCard];
+				fakeRandom.spliceArrayElement = jasmine.createSpy().and.callFake(function (array) {
+					array.splice(0, 1);
+				});
+			});
+			afterEach(function () {
+				delete fakeRandom.spliceArrayElement;
 			});
 
-			it('should still contain the first card', function () {
+			it('keeps selecting a card at random until there are no more cards', function () {
 				deckInstance.shuffle();
 
-				expect(deckInstance.cards.indexOf(firstCard)).not.toEqual(-1);
+				expect(fakeRandom.spliceArrayElement.calls.count()).toEqual(3);
 			});
-			it('should still contain the second card', function () {
-				deckInstance.shuffle();
+		});
 
-				expect(deckInstance.cards.indexOf(secondCard)).not.toEqual(-1);
+		describe('draw', function () {
+			beforeEach(function () {
+				deckInstance = new Deck();
+				deckInstance.cards = ['first card', 'second card'];
 			});
-			it('should still contain the third card', function () {
-				deckInstance.shuffle();
 
-				expect(deckInstance.cards.indexOf(thirdCard)).not.toEqual(-1);
+			it('returns the first card', function () {
+				var result = deckInstance.draw();
+
+				expect(result).toEqual('second card');
 			});
 		});
 	});
