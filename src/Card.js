@@ -2,22 +2,25 @@
 	'use strict';
 
 	function getSuitMapValue (cardType) {
-		var adjustedValue = cardType - cardType % 13,
+		var adjustedValue,
 			suitMapValue;
 
-		suitMapValue = adjustedValue / 4;
-		if (suitMapValue === 4) {
-			suitMapValue = 0;
-		}
+		cardType--;
+		adjustedValue = cardType - cardType % 13
+		suitMapValue = adjustedValue / 13;
 
 		return suitMapValue;
 	}
 
 	function Card (cardType) {
-		this.value = this.valueMap[cardType % 13];
-		this.suit = this.suitMap[getSuitMapValue(cardType)];
-		this.isPictureCard = !!parseInt(this.value);
-		this.isHigh = this.isPictureCard;
+		if (cardType > 0 && cardType < 53) {
+			this.value = this.valueMap[cardType % 13];
+			this.suit = this.suitMap[getSuitMapValue(cardType)];
+			this.isPictureCard = !!parseInt(this.value);
+			this.isHigh = this.isPictureCard;
+		} else {
+			throw new RangeError('cardtype must be a number between 1 and 52');
+		}
 	}
 
 	Card.prototype.valueMap = {
@@ -43,7 +46,12 @@
 		3: 'Spades'
 	};
 
-	Card.prototype.toString = function() {
+	/**
+	 * Returns the numeric value of the card.
+	 * Aces can be high or low defined by the "isHigh" flag
+	 * @return {Number} The numeric value of the card
+	 */
+	Card.prototype.valueOf = function() {
 		var rawValue = this.value,
 			numericValue = parseInt(rawValue);
 
@@ -62,6 +70,17 @@
 
 	Card.prototype.goLow = function() {
 		this.isHigh = false;
+	};
+
+	Card.prototype.isAFace = function() {
+		var value = this.value,
+			isFace = isNaN(parseInt(value));
+
+		return isFace && value !== 'A';
+	};
+
+	Card.prototype.isAce = function() {
+		return this.value === 'A';
 	};
 
 	module.exports = Card;
